@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+/**
+ * @fileoverview Description of file. This file defines the footer component
+ */
+</script>
 
 <template>
   <v-footer height="auto" app color="#edf5f1" class="py-16">
