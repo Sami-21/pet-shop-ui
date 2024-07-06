@@ -15,16 +15,11 @@ import { configDefaults } from "vitest/config";
 // https://vitejs.dev/config/
 export default defineConfig({
   test: {
-    server: {
-      deps: {
-        inline: ["vuetify"],
-      },
-    },
+    globals: true,
     environment: "jsdom",
-    exclude: [...configDefaults.exclude, "e2e/*"],
-    root: fileURLToPath(new URL("./", import.meta.url)),
-    transformMode: {
-      web: [/\.[jt]sx$/],
+    setupFiles: "vuetify.config.ts",
+    deps: {
+      inline: ["vuetify"],
     },
   },
   plugins: [
