@@ -85,7 +85,7 @@ const addressRules = ref<any[]>([
     return "Address is required.";
   },
 ]);
-const password = ref<string>("password");
+const password = ref<string>("");
 const isPasswordShown = ref<boolean>(false);
 const passwordRules = ref<any[]>([
   (value: string) => {
@@ -98,7 +98,7 @@ const passwordRules = ref<any[]>([
     return true;
   },
 ]);
-const passwordConfirmation = ref<string>("password");
+const passwordConfirmation = ref<string>("");
 const isPasswordShownConfirmation = ref<boolean>(false);
 const passwordConfirmationRules = ref<any[]>([
   (value: string) => {

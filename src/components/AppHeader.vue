@@ -3,10 +3,22 @@
  * @fileoverview Description of file. This file defines the navigation bar component
  */
 
+import { useAuthStore } from "@/stores/authStore";
 import { ref } from "vue";
-console.log();
-const isDrawerOpen = ref<Boolean>(false);
 
+const authStore = useAuthStore();
+const isAuthenticated = ref<boolean>(
+  authStore.token != "" || authStore.user != null
+);
+watch(
+  authStore,
+  () => {
+    isAuthenticated.value = authStore.token != "" || authStore.user != null;
+  },
+  { deep: true }
+);
+
+const isDrawerOpen = ref<Boolean>(false);
 const items = ref<any[]>([
   {
     title: "Products",
@@ -23,11 +35,11 @@ const items = ref<any[]>([
 ]);
 
 const isLoginDialogVisible = ref<boolean>(false);
-const isRegisterDialogVisible = ref<boolean>(false);
 const handleLoginDialogCloseEvent = () => {
   isLoginDialogVisible.value = false;
 };
 
+const isRegisterDialogVisible = ref<boolean>(false);
 const handleRegisterDialogCloseEvent = () => {
   isRegisterDialogVisible.value = false;
 };
@@ -51,7 +63,7 @@ const handleRegisterDialogCloseEvent = () => {
             >
           </v-col>
 
-          <v-col md="5" cols="0" class="d-md-flex d-none">
+          <v-col md="4" cols="0" class="d-md-flex d-none">
             <v-row no-gutters>
               <v-col>
                 <v-btn
@@ -73,8 +85,8 @@ const handleRegisterDialogCloseEvent = () => {
             </v-row>
           </v-col>
 
-          <v-col class="d-md-flex d-none" md="3" cols="0">
-            <v-row no-gutters>
+          <v-col class="d-md-flex d-none" md="4" cols="0">
+            <v-row class="ga-2" no-gutters>
               <v-col>
                 <v-btn prepend-icon="mdi-cart" variant="outlined">
                   Cart (0)</v-btn
@@ -82,11 +94,25 @@ const handleRegisterDialogCloseEvent = () => {
               </v-col>
               <v-col>
                 <v-btn
+                  v-if="!isAuthenticated"
                   @click="isLoginDialogVisible = !isLoginDialogVisible"
                   variant="outlined"
                 >
                   Login
                 </v-btn>
+                <v-btn v-else @click="authStore.logout" variant="outlined">
+                  Logout
+                </v-btn>
+              </v-col>
+              <v-col>
+                <v-avatar
+                  v-if="isAuthenticated"
+                  class="profile-avatar"
+                  size="small"
+                  color="info"
+                >
+                  <v-icon icon="mdi-account-circle"></v-icon>
+                </v-avatar>
               </v-col>
             </v-row>
           </v-col>
@@ -118,12 +144,33 @@ const handleRegisterDialogCloseEvent = () => {
             Cart (0)</v-btn
           >
           <v-btn
+            v-if="!isAuthenticated"
             @click="isLoginDialogVisible = !isLoginDialogVisible"
             color="white"
             variant="outlined"
           >
             Login
           </v-btn>
+          <v-btn
+            v-else
+            @click="
+              () => {
+                authStore.logout();
+                isDrawerOpen = false;
+              }
+            "
+            color="white"
+            variant="outlined"
+          >
+            Logout
+          </v-btn>
+          <div class="d-flex justify-center">
+            <v-btn>
+              <v-avatar v-if="isAuthenticated" color="info">
+                <v-icon icon="mdi-account-circle"></v-icon>
+              </v-avatar>
+            </v-btn>
+          </div>
         </div>
       </template>
     </v-navigation-drawer>
@@ -159,5 +206,9 @@ const handleRegisterDialogCloseEvent = () => {
 .navigation-item {
   color: white !important;
   font-size: 18px !important;
+}
+
+.profile-avatar {
+  cursor: pointer;
 }
 </style>

@@ -1,15 +1,21 @@
+/**
+ * @fileoverview Description of file. This file defines authentication store
+ */
+
 import { AuthState } from "@/types/authState.type";
 import { CreateUserData } from "@/types/createUserData.type";
 import axios from "axios";
 import { defineStore } from "pinia";
 import { useCookies } from "vue3-cookies";
+import { useSnackbarStore } from "./snackbarStore";
+import { User } from "@/types/user.type";
 
 const { cookies } = useCookies();
 
 export const useAuthStore = defineStore("AuthStore", {
   state: (): AuthState => {
     return {
-      user: cookies.get("user") ? cookies.get("user") : {},
+      user: cookies.get("user") ? JSON.parse(cookies.get("user")) : null,
       token: cookies.get("token") ? cookies.get("token") : "",
       error: null,
       errors: [],
@@ -24,11 +30,16 @@ export const useAuthStore = defineStore("AuthStore", {
 
   actions: {
     reset() {
-      this.user = {};
+      this.user = null;
       this.token = "";
       this.error = null;
       this.errors = [];
       this.isLoading = false;
+    },
+
+    resetCookies() {
+      cookies.set("token", "");
+      cookies.set("user", "");
     },
 
     resetErrors() {
@@ -53,7 +64,7 @@ export const useAuthStore = defineStore("AuthStore", {
         cookies.set("token", data.data.token);
 
         return data;
-      } catch (error) {
+      } catch (error: any) {
         this.error = error.response.data.error;
         this.errors = error.response.data.errors;
         this.isLoading = false;
@@ -70,10 +81,25 @@ export const useAuthStore = defineStore("AuthStore", {
           import.meta.env.VITE_API_URL + "/user/create",
           { ...createUserData }
         );
-
-        this.token = data.token;
+        console.log(data.data.token);
+        this.token = data.data.token;
+        cookies.set("token", data.data.token);
+        const user: User = {
+          first_name: data.data.first_name,
+          last_name: data.data.last_name,
+          email: data.data.email,
+          phone_number: data.data.phone_number,
+          address: data.data.address,
+          avatar: data.data.avatar,
+          created_at: data.data.created_at,
+          is_marketing: data.data.is_marketing,
+          updated_at: data.data.updated_at,
+          uuid: data.data.uuid,
+        };
+        this.user = user;
+        cookies.set("user", JSON.stringify(user));
         this.isLoading = false;
-      } catch (error) {
+      } catch (error: any) {
         this.error = error.response.data.error;
         this.errors = error.response.data.errors;
         this.isLoading = false;
@@ -82,7 +108,35 @@ export const useAuthStore = defineStore("AuthStore", {
       }
     },
 
-    async getUser() {
+    async logout() {
+      const snackbarStore = useSnackbarStore();
+      try {
+        this.isLoading = true;
+        this.resetErrors();
+        const { data } = await axios.get(
+          import.meta.env.VITE_API_URL + "/user/logout",
+          {
+            headers: {
+              Authorization: "Bearer " + this.token,
+            },
+          }
+        );
+        if (data.success) {
+          this.reset();
+          this.resetCookies();
+        }
+        snackbarStore.setState(true, "Logout success", "success");
+      } catch (error: any) {
+        snackbarStore.setState(true, error.response.data.error, "error");
+        this.error = error.response.data.error;
+        this.errors = error.response.data.errors;
+        this.isLoading = false;
+
+        throw error;
+      }
+    },
+
+    async getUserData() {
       try {
         this.isLoading = true;
         this.resetErrors();
@@ -97,7 +151,7 @@ export const useAuthStore = defineStore("AuthStore", {
 
         this.token = data.token;
         this.isLoading = false;
-      } catch (error) {
+      } catch (error: any) {
         this.error = error.response.data.error;
         this.errors = error.response.data.errors;
         this.isLoading = false;

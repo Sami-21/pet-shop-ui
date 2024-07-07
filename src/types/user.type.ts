@@ -1,7 +1,12 @@
 export interface User {
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  phone: string;
+  phone_number: string;
   address: string;
+  avatar?: string | null;
+  created_at: string | Date;
+  is_marketing?: boolean;
+  updated_at: string | Date;
+  uuid: string;
 }
