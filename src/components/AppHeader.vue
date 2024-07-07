@@ -43,6 +43,11 @@ const isRegisterDialogVisible = ref<boolean>(false);
 const handleRegisterDialogCloseEvent = () => {
   isRegisterDialogVisible.value = false;
 };
+
+const isUserProfileDialogVisible = ref<boolean>(false);
+const handleUserProfileDialogCloseEvent = () => {
+  isUserProfileDialogVisible.value = false;
+};
 </script>
 
 <template>
@@ -110,6 +115,7 @@ const handleRegisterDialogCloseEvent = () => {
                   class="profile-avatar"
                   size="small"
                   color="info"
+                  @click="isUserProfileDialogVisible = true"
                 >
                   <v-icon icon="mdi-account-circle"></v-icon>
                 </v-avatar>
@@ -165,11 +171,14 @@ const handleRegisterDialogCloseEvent = () => {
             Logout
           </v-btn>
           <div class="d-flex justify-center">
-            <v-btn>
-              <v-avatar v-if="isAuthenticated" color="info">
-                <v-icon icon="mdi-account-circle"></v-icon>
-              </v-avatar>
-            </v-btn>
+            <v-avatar
+              class="profile-avatar"
+              v-if="isAuthenticated"
+              color="info"
+              @click="isUserProfileDialogVisible = true"
+            >
+              <v-icon icon="mdi-account-circle"></v-icon>
+            </v-avatar>
           </div>
         </div>
       </template>
@@ -183,6 +192,10 @@ const handleRegisterDialogCloseEvent = () => {
       @close="handleRegisterDialogCloseEvent"
       @openLoginDialog="isLoginDialogVisible = true"
       :isDialogVisible="isRegisterDialogVisible"
+    />
+    <UserProfileDialog
+      @close="handleUserProfileDialogCloseEvent"
+      :isDialogVisible="isUserProfileDialogVisible"
     />
   </div>
 </template>

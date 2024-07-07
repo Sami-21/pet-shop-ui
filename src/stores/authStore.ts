@@ -15,8 +15,10 @@ const { cookies } = useCookies();
 export const useAuthStore = defineStore("AuthStore", {
   state: (): AuthState => {
     return {
-      user: cookies.get("user") ? JSON.parse(cookies.get("user")) : null,
+      user: cookies.get("user") ? cookies.get("user") : null,
       token: cookies.get("token") ? cookies.get("token") : "",
+      orders: [],
+      totalOrders: 0,
       error: null,
       errors: [],
       isLoading: false,
@@ -81,7 +83,6 @@ export const useAuthStore = defineStore("AuthStore", {
           import.meta.env.VITE_API_URL + "/user/create",
           { ...createUserData }
         );
-        console.log(data.data.token);
         this.token = data.data.token;
         cookies.set("token", data.data.token);
         const user: User = {
@@ -149,7 +150,33 @@ export const useAuthStore = defineStore("AuthStore", {
           }
         );
 
-        this.token = data.token;
+        this.user = data.data;
+        cookies.set("user", JSON.stringify(data.data));
+        this.isLoading = false;
+      } catch (error: any) {
+        this.error = error.response.data.error;
+        this.errors = error.response.data.errors;
+        this.isLoading = false;
+
+        throw error;
+      }
+    },
+
+    async getUserOrders(page: number, perPage: number) {
+      try {
+        this.isLoading = true;
+        this.resetErrors();
+        const { data } = await axios.get(
+          import.meta.env.VITE_API_URL +
+            `/user/orders?page=${page}&per_page=${perPage}`,
+          {
+            headers: {
+              Authorization: "Bearer " + this.token,
+            },
+          }
+        );
+
+        this.orders = data.data;
         this.isLoading = false;
       } catch (error: any) {
         this.error = error.response.data.error;
