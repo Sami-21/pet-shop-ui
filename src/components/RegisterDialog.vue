@@ -3,6 +3,12 @@
  * @fileoverview Description of file. This file defines the Register dialog component responsible for the user acount creation
  */
 
+import { useAuthStore } from "@/stores/authStore";
+import { CreateUserData } from "@/types/createUserData.type";
+import { VForm } from "vuetify/components";
+
+const authStore = useAuthStore();
+
 const emit = defineEmits(["close", "openLoginDialog"]);
 const props = defineProps({
   isDialogVisible: { type: Boolean, required: true },
@@ -31,12 +37,12 @@ const openLoginDialog = () => {
   emit("close");
 };
 
-const form = ref<VForm>(null);
+const form = ref<VForm | null>(null);
 const loading = ref<Boolean>(false);
 
 const firstName = ref<string>("");
 const firstNameRules = ref<any[]>([
-  (value) => {
+  (value: string) => {
     if (value) return true;
 
     return "First name is required.";
@@ -44,7 +50,7 @@ const firstNameRules = ref<any[]>([
 ]);
 const lastName = ref<string>("");
 const lastNameRules = ref<any[]>([
-  (value) => {
+  (value: string) => {
     if (value) return true;
 
     return "Last name is required.";
@@ -52,12 +58,12 @@ const lastNameRules = ref<any[]>([
 ]);
 const email = ref<string>("");
 const emailRules = ref<any[]>([
-  (value) => {
+  (value: string) => {
     if (value) return true;
 
     return "E-mail is required.";
   },
-  (value) => {
+  (value: string) => {
     if (/.+@.+\..+/.test(value)) return true;
 
     return "E-mail must be valid.";
@@ -65,7 +71,7 @@ const emailRules = ref<any[]>([
 ]);
 const phone = ref<string>("");
 const phoneRules = ref<any[]>([
-  (value) => {
+  (value: string) => {
     if (value) return true;
 
     return "Phone number is required.";
@@ -73,40 +79,59 @@ const phoneRules = ref<any[]>([
 ]);
 const address = ref<string>("");
 const addressRules = ref<any[]>([
-  (value) => {
+  (value: string) => {
     if (value) return true;
 
     return "Address is required.";
   },
 ]);
-const password = ref<string>("");
+const password = ref<string>("password");
 const isPasswordShown = ref<boolean>(false);
 const passwordRules = ref<any[]>([
-  (value) => {
+  (value: string) => {
     if (value) return true;
 
     return "Password is required.";
   },
+  (value: string) => {
+    if (value.length < 8) return "Password must be atleast 8 characters long.";
+    return true;
+  },
 ]);
-const passwordConfirmation = ref<string>("");
+const passwordConfirmation = ref<string>("password");
 const isPasswordShownConfirmation = ref<boolean>(false);
 const passwordConfirmationRules = ref<any[]>([
-  (value) => {
+  (value: string) => {
     if (value) return true;
 
     return "Password confirmation is required.";
   },
-  (value) => {
-    if (value != password.value)
+  (value: string) => {
+    if (value !== password.value)
       return "Password confirmation must match the password.";
+    return true;
   },
 ]);
 
 const submit = async () => {
   loading.value = true;
-  const { valid } = await form.value.validate();
-  loading.value = false;
-  if (valid) alert("Form is valid");
+  if (form.value) {
+    const { valid } = await form.value.validate();
+    loading.value = false;
+    if (valid) {
+      const data: CreateUserData = {
+        first_name: firstName.value,
+        last_name: lastName.value,
+        email: email.value,
+        phone_number: phone.value,
+        address: address.value,
+        password: password.value,
+        password_confirmation: passwordConfirmation.value,
+      };
+      await authStore.create(data);
+      closeDialog();
+    }
+  }
 };
 </script>
 
@@ -212,6 +237,9 @@ const submit = async () => {
             :loading="loading"
             >Sign up</v-btn
           >
+          <p class="text-center mt-2 text-red" v-if="authStore.error">
+            {{ authStore.error }}
+          </p>
         </v-form>
 
         <v-card-actions class="justify-center">

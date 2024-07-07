@@ -3,6 +3,11 @@
  * @fileoverview Description of file. This file defines the login dialog component responsible for the authencitation of the user
  */
 
+import { useAuthStore } from "@/stores/authStore";
+import { VForm } from "vuetify/components";
+
+const authStore = useAuthStore();
+
 const emit = defineEmits(["close", "openRegisterDialog"]);
 const props = defineProps({
   isDialogVisible: { type: Boolean, required: true },
@@ -31,17 +36,16 @@ const openRegisterDialog = () => {
   emit("close");
 };
 
-const form = ref<VForm>(null);
-const loading = ref<Boolean>(false);
+const form = ref<VForm | null>(null);
 
 const email = ref<string>("");
 const emailRules = ref<any[]>([
-  (value) => {
+  (value: string) => {
     if (value) return true;
 
     return "E-mail is required.";
   },
-  (value) => {
+  (value: string) => {
     if (/.+@.+\..+/.test(value)) return true;
 
     return "E-mail must be valid.";
@@ -50,7 +54,7 @@ const emailRules = ref<any[]>([
 const password = ref<string>("");
 const isPasswordShown = ref<boolean>(false);
 const passwordRules = ref<any[]>([
-  (value) => {
+  (value: string) => {
     if (value) return true;
 
     return "Password is required.";
@@ -58,10 +62,17 @@ const passwordRules = ref<any[]>([
 ]);
 
 const submit = async () => {
-  loading.value = true;
-  const { valid } = await form.value.validate();
-  loading.value = false;
-  if (valid) alert("Form is valid");
+  try {
+    if (form.value) {
+      const { valid } = await form.value.validate();
+      if (valid) {
+        await authStore.login(email.value, password.value);
+        closeDialog();
+      }
+    }
+  } catch (error) {
+    // console.log(error);
+  }
 };
 </script>
 
@@ -110,9 +121,12 @@ const submit = async () => {
             class="login-btn"
             color="#4ec690"
             type="submit"
-            :loading="loading"
+            :loading="authStore.isLoading"
             >Log In</v-btn
           >
+          <p class="text-center mt-2 text-red" v-if="authStore.error">
+            {{ authStore.error }}
+          </p>
         </v-form>
 
         <v-card-actions class="mt-2">

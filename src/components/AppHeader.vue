@@ -4,7 +4,7 @@
  */
 
 import { ref } from "vue";
-
+console.log();
 const isDrawerOpen = ref<Boolean>(false);
 
 const items = ref<any[]>([
@@ -22,8 +22,8 @@ const items = ref<any[]>([
   },
 ]);
 
-const isLoginDialogVisible = ref<Boolean>(false);
-const isRegisterDialogVisible = ref<Boolean>(false);
+const isLoginDialogVisible = ref<boolean>(false);
+const isRegisterDialogVisible = ref<boolean>(false);
 const handleLoginDialogCloseEvent = () => {
   isLoginDialogVisible.value = false;
 };
@@ -35,7 +35,13 @@ const handleRegisterDialogCloseEvent = () => {
 
 <template>
   <div>
-    <v-app-bar scroll-behavior="hide" :elevation="0" color="#4ec690">
+    <v-app-bar
+      app
+      scroll-behavior="hide"
+      :elevation="0"
+      color="#4ec690"
+      id="app-header"
+    >
       <v-container>
         <v-row no-gutters align="center" justify="space-between">
           <v-col md="2" cols="4">
@@ -111,7 +117,13 @@ const handleRegisterDialogCloseEvent = () => {
           <v-btn color="white" prepend-icon="mdi-cart" variant="outlined">
             Cart (0)</v-btn
           >
-          <v-btn color="white" variant="outlined"> Login </v-btn>
+          <v-btn
+            @click="isLoginDialogVisible = !isLoginDialogVisible"
+            color="white"
+            variant="outlined"
+          >
+            Login
+          </v-btn>
         </div>
       </template>
     </v-navigation-drawer>
