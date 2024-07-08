@@ -10,16 +10,16 @@ import Vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 // Utilities
 import { defineConfig } from "vite";
 import { fileURLToPath, URL } from "node:url";
-import { configDefaults } from "vitest/config";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
-    setupFiles: "vuetify.config.ts",
-    deps: {
-      inline: ["vuetify"],
+    server: {
+      deps: {
+        inline: ["vuetify"],
+      },
     },
   },
   plugins: [
