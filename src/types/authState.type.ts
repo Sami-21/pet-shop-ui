@@ -5,7 +5,7 @@ export interface AuthState {
   user: User | null;
   token: string;
   orders: Order[];
-  ordersTotal: number;
+  totalOrders: number;
   error: string | null;
   errors: Object | string[];
   isLoading: boolean;

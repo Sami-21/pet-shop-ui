@@ -60,7 +60,6 @@ export const useAuthStore = defineStore("AuthStore", {
             password,
           }
         );
-
         this.token = data.data.token;
         this.isLoading = false;
         cookies.set("token", data.data.token);
@@ -100,6 +99,8 @@ export const useAuthStore = defineStore("AuthStore", {
         this.user = user;
         cookies.set("user", JSON.stringify(user));
         this.isLoading = false;
+
+        return data;
       } catch (error: any) {
         this.error = error.response.data.error;
         this.errors = error.response.data.errors;
@@ -114,6 +115,7 @@ export const useAuthStore = defineStore("AuthStore", {
       try {
         this.isLoading = true;
         this.resetErrors();
+
         const { data } = await axios.get(
           import.meta.env.VITE_API_URL + "/user/logout",
           {
@@ -122,16 +124,16 @@ export const useAuthStore = defineStore("AuthStore", {
             },
           }
         );
-        if (data.success) {
-          this.reset();
-          this.resetCookies();
-        }
+        this.reset();
+        this.resetCookies();
         snackbarStore.setState(true, "Logout success", "success");
+
+        return data;
       } catch (error: any) {
+        this.isLoading = false;
         snackbarStore.setState(true, error.response.data.error, "error");
         this.error = error.response.data.error;
         this.errors = error.response.data.errors;
-        this.isLoading = false;
 
         throw error;
       }
@@ -153,7 +155,11 @@ export const useAuthStore = defineStore("AuthStore", {
         this.user = data.data;
         cookies.set("user", JSON.stringify(data.data));
         this.isLoading = false;
+
+        return data;
       } catch (error: any) {
+        const snackbarStore = useSnackbarStore();
+        snackbarStore.setState(true, error.response.data.error, "error");
         this.error = error.response.data.error;
         this.errors = error.response.data.errors;
         this.isLoading = false;
@@ -178,6 +184,7 @@ export const useAuthStore = defineStore("AuthStore", {
 
         this.orders = data.data;
         this.isLoading = false;
+        return data;
       } catch (error: any) {
         this.error = error.response.data.error;
         this.errors = error.response.data.errors;

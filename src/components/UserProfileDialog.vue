@@ -127,7 +127,7 @@ const closeDialog = () => {
             v-model:items-per-page="itemsPerPage"
             :headers="headers"
             :items="authStore.orders"
-            :items-length="authStore.ordersTotal"
+            :items-length="authStore.totalOrders"
             :loading="authStore.isLoading"
             :search="search"
             item-value="name"
