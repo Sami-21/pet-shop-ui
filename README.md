@@ -14,8 +14,6 @@ Pet shop UI is a project designed to test candidates experience in frontend deve
 
 This application is connected to the existing PetShop API test demo and fetch all the necessary data from it's endpoints.
 
-You are required to write a VueJS application based on the User Stories and Technical requirements presented in this document.
-
 This project was created using the following technologies and tools:
 - [VueJS framework](https://vuejs.org)
 - [Vuetify UI library](https://vuetifyjs.com/en/)
